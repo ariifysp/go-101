@@ -16,8 +16,8 @@ type (
 	}
 
 	ItemModel struct {
-		ID          uint64 `json:"item_id"`
-		Name        string `json:"item_name"`
+		ID          uint64 `json:"itemID"`
+		Name        string `json:"itemName"`
 		Description string `json:"description"`
 		Picture     string `json:"picture"`
 		Price       uint   `json:"price"`
