@@ -16,11 +16,11 @@ type (
 	}
 
 	ItemModel struct {
-		ID          uint64
-		Name        string
-		Description string
-		Picture     string
-		Price       uint
+		ID          uint64 `json:"item_id"`
+		Name        string `json:"item_name"`
+		Description string `json:"description"`
+		Picture     string `json:"picture"`
+		Price       uint   `json:"price"`
 	}
 
 	ItemFilter struct {
