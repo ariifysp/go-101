@@ -15,6 +15,14 @@ type (
 		UpdatedAt   time.Time
 	}
 
+	ItemModel struct {
+		ID          uint64
+		Name        string
+		Description string
+		Picture     string
+		Price       uint
+	}
+
 	ItemFilter struct {
 		Name        string `query:"name" validate:"omitempty,max=64"`
 		Description string `query:"description" validate:"omitempty,max=128"`
@@ -25,4 +33,24 @@ type (
 		Page int64 `query:"page" validate:"required,gte=1"`
 		Size int64 `query:"size" validate:"required,min=1,max=20"`
 	}
+
+	ItemResult struct {
+		Items    []*ItemModel   `json:"items"`
+		Paginate PaginateResult `json:"paginate"`
+	}
+
+	PaginateResult struct {
+		Page      int64 `json:"page"`
+		TotalPage int64 `json:"totalPage"`
+	}
 )
+
+func (i *Item) ToItemModel() *ItemModel {
+	return &ItemModel{
+		ID:          i.ID,
+		Name:        i.Name,
+		Description: i.Description,
+		Picture:     i.Picture,
+		Price:       i.Price,
+	}
+}

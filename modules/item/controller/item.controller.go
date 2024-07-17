@@ -30,10 +30,10 @@ func (c *ItemController) ItemList(ctx fiber.Ctx) error {
 		return custom.ErrorResponse(ctx, fiber.ErrBadRequest, err)
 	}
 
-	itemList, err := c.itemService.ItemListService(itemFilter)
+	result, err := c.itemService.ItemListService(itemFilter)
 	if err != nil {
 		return custom.ErrorResponse(ctx, fiber.ErrInternalServerError, err)
 	}
 
-	return custom.DataResponse(ctx, fiber.StatusOK, itemList)
+	return custom.DataResponse(ctx, fiber.StatusOK, result)
 }
