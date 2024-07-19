@@ -10,6 +10,10 @@ type (
 	ItemRepositoryInterface interface {
 		GetItemList(itemFilter *itemModel.ItemFilter) ([]*itemModel.Item, error)
 		CountItems(itemFilter *itemModel.ItemFilter) (int64, error)
+		GetItemByID(itemID uint64) (*itemModel.Item, error)
+		CreateItem(item *itemModel.Item) (*itemModel.Item, error)
+		UpdateItem(itemID uint64, item *itemModel.ItemUpdate) (uint64, error)
+		DeleteItem(itemID uint64) error
 	}
 
 	ItemRepository struct {
@@ -60,4 +64,40 @@ func (r *ItemRepository) CountItems(itemFilter *itemModel.ItemFilter) (int64, er
 	}
 
 	return count, nil
+}
+
+func (r *ItemRepository) GetItemByID(itemID uint64) (*itemModel.Item, error) {
+	itemResult := new(itemModel.Item)
+
+	if err := r.db.Connect().Model(&itemModel.Item{}).First(itemResult, itemID).Error; err != nil {
+		return nil, &exception.ItemNotFound{ItemID: itemID}
+	}
+
+	return itemResult, nil
+}
+
+func (r *ItemRepository) CreateItem(item *itemModel.Item) (*itemModel.Item, error) {
+	newItem := new(itemModel.Item)
+
+	if err := r.db.Connect().Model(&itemModel.Item{}).Create(item).Scan(newItem).Error; err != nil {
+		return nil, &exception.CreateItem{}
+	}
+
+	return newItem, nil
+}
+
+func (r *ItemRepository) UpdateItem(itemID uint64, itemUpdate *itemModel.ItemUpdate) (uint64, error) {
+	if err := r.db.Connect().Model(&itemModel.Item{}).Where("id = ?", itemID).Updates(itemUpdate).Error; err != nil {
+		return 0, &exception.UpdateItem{ItemID: itemID}
+	}
+
+	return itemID, nil
+}
+
+func (r *ItemRepository) DeleteItem(itemID uint64) error {
+	if err := r.db.Connect().Model(&itemModel.Item{}).Where("id = ?", itemID).Update("is_deleted", true).Error; err != nil {
+		return &exception.DeleteItem{ItemID: itemID}
+	}
+
+	return nil
 }

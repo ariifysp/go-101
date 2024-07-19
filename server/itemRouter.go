@@ -14,4 +14,7 @@ func (s *Server) ItemRouter() {
 	itemController := itemController.NewItemController(itemService)
 
 	routerItem.Get("", itemController.ItemList)
+	routerItem.Post("", itemController.CreateItem)
+	routerItem.Patch("/:itemID", itemController.UpdateItem)
+	routerItem.Delete("/:itemID", itemController.DeleteItem)
 }

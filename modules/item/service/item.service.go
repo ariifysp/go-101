@@ -8,7 +8,10 @@ import (
 
 type (
 	ItemServiceInterface interface {
-		ItemListService(itemFilter *itemModel.ItemFilter) (*itemModel.ItemResult, error)
+		ItemList(itemFilter *itemModel.ItemFilter) (*itemModel.ItemResult, error)
+		CreateItem(itemCreate *itemModel.ItemCreate) (*itemModel.Item, error)
+		UpdateItem(itemID uint64, itemUpdate *itemModel.ItemUpdate) (*itemModel.Item, error)
+		DeleteItem(itemID uint64) error
 	}
 
 	ItemService struct {
@@ -20,7 +23,7 @@ func NewItemService(itemRepository itemRepository.ItemRepositoryInterface) ItemS
 	return &ItemService{itemRepository}
 }
 
-func (s *ItemService) ItemListService(itemFilter *itemModel.ItemFilter) (*itemModel.ItemResult, error) {
+func (s *ItemService) ItemList(itemFilter *itemModel.ItemFilter) (*itemModel.ItemResult, error) {
 	total, err := s.itemRepository.CountItems(itemFilter)
 	if err != nil {
 		return nil, err
@@ -53,4 +56,38 @@ func (s *ItemService) itemsResultResponse(itemList []*itemModel.Item, page, tota
 			TotalPage: totalPage,
 		},
 	}
+}
+
+func (s *ItemService) CreateItem(itemCreate *itemModel.ItemCreate) (*itemModel.Item, error) {
+	item := &itemModel.Item{
+		Name:        itemCreate.Name,
+		Description: itemCreate.Description,
+		Picture:     itemCreate.Picture,
+		Price:       itemCreate.Price,
+	}
+
+	newItem, err := s.itemRepository.CreateItem(item)
+	if err != nil {
+		return nil, err
+	}
+
+	return newItem, nil
+}
+
+func (s *ItemService) UpdateItem(itemID uint64, itemUpdate *itemModel.ItemUpdate) (*itemModel.Item, error) {
+	_, err := s.itemRepository.UpdateItem(itemID, itemUpdate)
+	if err != nil {
+		return nil, err
+	}
+
+	item, err := s.itemRepository.GetItemByID(itemID)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
+}
+
+func (s *ItemService) DeleteItem(itemID uint64) error {
+	return s.itemRepository.DeleteItem(itemID)
 }
